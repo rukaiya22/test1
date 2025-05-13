@@ -17,6 +17,10 @@ export class ExamStack extends cdk.Stack {
     const table = new dynamodb.Table(this, "CinemasTable", {
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       partitionKey: { name: "cinemaId", type: dynamodb.AttributeType.NUMBER },
+      sortKey: {
+        name: 'movieId',
+        type: dynamodb.AttributeType.STRING,
+      },
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       tableName: "CinemaTable",
     });
