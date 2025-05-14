@@ -37,6 +37,18 @@ export class ExamStack extends cdk.Stack {
       },
     });
 
+    const myFn = new lambdanode.NodejsFunction(this, "ShumonaFn", {
+      architecture: lambda.Architecture.ARM_64,
+      runtime: lambda.Runtime.NODEJS_22_X,
+      entry: `${__dirname}/../lambdas/test.ts`,
+      timeout: cdk.Duration.seconds(10),
+      memorySize: 128,
+      environment: {
+        REGION: "eu-west-1",
+        TABLE_NAME: "CinemaTable"
+      },
+    });
+
     new custom.AwsCustomResource(this, "moviesddbInitData", {
       onCreate: {
         service: "DynamoDB",
@@ -65,6 +77,11 @@ export class ExamStack extends cdk.Stack {
         allowOrigins: ["*"],
       },
     });
+
+    const apiResource = api.root.addResource("shumona");
+    const shumonaResouce = apiResource.addResource("siblee");
+    shumonaResouce.addMethod("POST", new apig.LambdaIntegration(myFn));
+    table.grantReadData(myFn);
 
   }
 }
